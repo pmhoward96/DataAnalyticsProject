@@ -1,0 +1,13 @@
+points = []
+for x in range(len(passingdf)):
+    yardPoints = passingdf.iloc[x]['Passing Yards'] % 25
+    #print(yardPoints)
+    tdPoints = passingdf.iloc[x]['Passing Touchdowns'] * 4
+    #print(tdPoints)
+    intPoints = passingdf.iloc[x]['Interceptions'] * -2
+    #print(intPoints)
+    totalPoints = yardPoints + tdPoints + intPoints
+    #print(totalPoints)
+    points.append(totalPoints)
+passingdf['Passing Fantasy Points'] = points
+passingdf
