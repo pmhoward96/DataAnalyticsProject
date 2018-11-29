@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 14 17:05:42 2018
-
-@author: P-Dog
-"""
-
 #http://www.nfl.com/stats/categorystats?archive=false&conference=null&statisticCategory=PASSING&season=1932&seasonType=REG&experience=&tabSeq=0&qualified=false&Submit=Go
 import urllib3 as ulib
 from bs4 import BeautifulSoup as bs
@@ -14,13 +7,32 @@ year = "http://www.nfl.com/stats/categorystats?tabSeq=0&season=1932&seasonType=R
 page = http.request('GET', year)
 soup = bs(page.data, "lxml")
 tables = soup.find_all("table")
+
+
+
 #print(tables)
 Cell, RK, P, Team, Pos, Comp, Att, Pct, AttG, Yds, Avg, YdsG, TD, Ints, First, FirstP, Lng, Twen, Fort, Sck, Rate, Year = [],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]
-for y in range(1,3):
-    end = "&seasonType=REG&Submit=Go&experience=&archive=false&conference=null&statisticCategory=PASSING&d-447263-p=" + str(y) + "&qualified=true"
-    for x in range(1932, 2019):
-        year = "http://www.nfl.com/stats/categorystats?tabSeq=0&season=" + str(x) + end
-        page = http.request('GET', year)
+for x in range(1932, 2019):
+    yearNumber = x
+    num = ""
+    year = "http://www.nfl.com/stats/categorystats?tabSeq=0&season=" + str(x)
+    yearTest = year + "&seasonType=REG&Submit=Go&experience=&archive=false&conference=null&statisticCategory=PASSING&d-447263-p=1&qualified=true"
+    page = http.request('GET', yearTest)
+    soup = bs(page.data, "lxml")
+    tag = soup.find_all("a")
+    first = str(tag).split('>')
+    for x in range(len(first)):
+        tag2 = first[x].split('<')
+        if tag2[0] == 'next':
+            temp = first[x - 2].split('<')
+            num = temp[0]
+            #print(num)
+            ran = int(num)
+    
+    for y in range(1, ran + 1):
+        end = "&seasonType=REG&Submit=Go&experience=&archive=false&conference=null&statisticCategory=PASSING&d-447263-p=" + str(y) + "&qualified=true"
+        full = year + end
+        page = http.request('GET', full)
         soup = bs(page.data, "lxml")
         tables = soup.find("table", class_ = "data-table1" )
         #if tables.string != "None":
@@ -52,7 +64,7 @@ for y in range(1,3):
                 Fort.append(cells[17].find(text=True))
                 Sck.append(cells[18].find(text=True))
                 Rate.append(cells[19].find(text=True))
-                Year.append(x)
+                Year.append(yearNumber)
             
            
                 
@@ -145,24 +157,25 @@ df = pd.DataFrame(Year, columns=['Year'])
 df['Player Name'] = P
 df['Team Name'] = Team
 df['Position'] = Pos
-df['Completions'] = Comp
-df['Attempts'] = Att
-df['Completion Percentage'] = Pct
-df['Attempts Per Game'] = AttG
+df['Passing Completions'] = Comp
+df['Passing Attempts'] = Att
+df['Passing Completion Percentage'] = Pct
+df['Passing Attempts Per Game'] = AttG
 df['Passing Yards'] = Yds
-df['Average Yards Gained'] = Avg
-df['Yards Per Game'] = YdsG
-df['Touchdowns'] = TD
+df['Average Passing Yards Gained'] = Avg
+df['Passing Yards Per Game'] = YdsG
+df['Passing Touchdowns'] = TD
 df['Interceptions'] = Ints
-df['First Downs'] = First
-df['First Down Percentage'] = FirstP
-df['Longest Play'] = Lng
-df['Plays over 20 Yards'] = Twen
-df['Plays over 40 Yards'] = Fort
+df['Passing First Downs'] = First
+df['Passing First Down Percentage'] = FirstP
+df['Longest Passing Play'] = Lng
+df['Passing Plays over 20 Yards'] = Twen
+df['Passing Plays over 40 Yards'] = Fort
 df['Sacks'] = Sck
 df['Quaterback Rating'] = Rate
 
 print(df.head())
+print(df)
 filename = "PassingStats.csv"
 f = open(filename, "w+")
 f.close()
